@@ -1,0 +1,23 @@
+# Deploy all graphics experiments to surge.sh
+language: node_js
+node_js: "9.10.1"
+
+install:
+  - npm install
+
+script:
+  - npm run build
+
+before_deploy:
+  - mkdir deploy/
+  - cp -r build/* deploy/
+
+deploy:
+  provider: surge
+  skip_cleanup: true
+  project: ./deploy
+  domain: graphics.surge.sh
+
+cache:
+  directories:
+    - node_modules

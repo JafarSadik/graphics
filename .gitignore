@@ -1,0 +1,13 @@
+# travis, surge, npm, ...
+node_modules
+package-lock.json
+deploy
+build
+target
+dist
+
+# IntelliJ IDEA 
+.idea/
+*.iml
+*.ipr
+*.iws

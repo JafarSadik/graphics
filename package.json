@@ -1,0 +1,45 @@
+{
+  "name": "graphics",
+  "engines": {
+    "npm": ">=5.6.0"
+  },
+  "private": true,
+  "scripts": {
+    "clean": "rimraf build",
+    "build": "run-s clean build:*",
+    "prestart": "run-s build",
+    "start": "run-p dev:*",
+    "dev:watch": "npm-watch",
+    "dev:live-server": "live-server build --port=9000",
+    "*** Electric Field ***": "",
+    "build:electric-field": "run-p electric-field:*",
+    "electric-field:js": "babel electric-field/**/*.js -d build",
+    "electric-field:copy-assets": "cpx electric-field/**/*.{html,css} build/electric-field",
+    "*** Canvas Patterns ***": "",
+    "build:canvas-patterns": "run-p canvas-patterns:*",
+    "canvas-patterns:js": "babel canvas-patterns/**/*.js -d build",
+    "canvas-patterns:copy-assets": "cpx canvas-patterns/**/*.{html,css} build/canvas-patterns"
+  },
+  "watch": {
+    "build:electric-field": {
+      "patterns": "electric-field",
+      "extensions": "html,css,js"
+    },
+    "build:canvas-patterns": {
+      "patterns": "canvas-patterns",
+      "extensions": "html,css,js"
+    }
+  },
+  "devDependencies": {
+    "cpx": "^1.5.0",
+    "npm-run-all": "^4.1.2",
+    "rimraf": "^2.5.4",
+    "live-server": "^1.2.0",
+    "npm-watch": "^0.3.0",
+    "babel-cli": "^6.26.0",
+    "babel-plugin-transform-runtime": "^6.23.0",
+    "babel-preset-env": "^1.6.1",
+    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-stage-2": "^6.24.1"
+  }
+}
