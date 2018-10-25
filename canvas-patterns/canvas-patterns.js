@@ -11,8 +11,46 @@ class Colour {
     }
 }
 
+class AnimationParameter {
+    constructor(start, min, max, delta) {
+        this.start = start;
+        this.min = min;
+        this.max = max;
+        this.delta = delta;
+        this.reset();
+    }
+
+    update() {
+        if (this.current > this.max || this.current < this.min) {
+            this.direction *= -1;
+        }
+        this.current += this.delta * this.direction;
+    }
+
+    reset() {
+        this.current = this.start;
+        this.direction = 1;
+    }
+
+    get() {
+        return this.current;
+    }
+
+    static bounded(start, max, delta) {
+        return new AnimationParameter(start, start, max, delta);
+    }
+
+    static unbounded(start, delta) {
+        return new AnimationParameter(start, -Infinity, Infinity, delta);
+    }
+
+    static none() {
+        return this.unbounded(1, 0);
+    }
+}
+
 class PatternRenderer {
-    constructor(canvasId, computePixel) {
+    constructor(canvasId, computePixel, animationParameter) {
         let canvas = document.getElementById(canvasId);
         this.ctx = canvas.getContext('2d');
         this.ctx.fillStyle = "#FFFFFF";
@@ -20,6 +58,8 @@ class PatternRenderer {
         this.height = canvas.height;
         this.image = this.ctx.createImageData(this.width, this.height);
         this.computePixel = computePixel;
+        this.animationParameter = animationParameter || AnimationParameter.none();
+        this.animation = {active: false, id: undefined}
     }
 
     draw() {
@@ -27,62 +67,72 @@ class PatternRenderer {
 
         for (let x = 0; x < this.width; x++) {
             for (let y = 0; y < this.height; y++) {
-                let {r, g, b, a} = this.computePixel(x, y);
-                this.setPixel(x, y, r, g, b, a)
+                let colour = this.computePixel(x, y, this.animationParameter.get());
+                this.setPixel(x, y, colour);
             }
         }
 
         this.ctx.putImageData(this.image, 0, 0);
     }
 
+    animate() {
+        if (!this.animation.active) {
+            const drawInterval = 100;
+            this.animation.id = setInterval(() => {
+                this.animationParameter.update();
+                this.draw();
+            }, drawInterval);
+        }
+    }
+
     clear() {
         this.ctx.clearRect(0, 0, this.width, this.height);
     }
 
-    setPixel(x, y, r, g, b, a) {
+    setPixel(x, y, colour) {
         let index = (x + y * this.image.width) * 4;
-        this.image.data[index] = r;
-        this.image.data[index + 1] = g;
-        this.image.data[index + 2] = b;
-        this.image.data[index + 3] = a;
+        this.image.data[index] = colour.r;
+        this.image.data[index + 1] = colour.g;
+        this.image.data[index + 2] = colour.b;
+        this.image.data[index + 3] = colour.a;
     }
 }
 
-const pattern1 = new PatternRenderer('pattern1', (x, y) => {
-    let c = 50 + Math.sin(x * y) * y;
+const pattern1 = new PatternRenderer('pattern1', (x, y, param) => {
+    let c = 50 + Math.sin(x * y * param) * y + param;
     return Colour.rgba(c, c, c, c);
-});
-pattern1.draw();
+}, AnimationParameter.unbounded(0, 0.01));
+pattern1.animate();
 
-const pattern2 = new PatternRenderer('pattern2', (x, y) => {
-    let c = x * y * Math.tan(100* x * y);
+const pattern2 = new PatternRenderer('pattern2', (x, y, param) => {
+    let c = x * y * Math.tan(100 * x * y * param);
     return Colour.rgba(0, 0, 100 + c % 150, 100 + c % 150);
-});
-pattern2.draw();
+}, AnimationParameter.bounded(0.001, 1, 0.0001));
+pattern2.animate();
 
 const pattern3 = new PatternRenderer('pattern3', (x, y) => {
     let c = x * y * Math.cos(x + y);
     return Colour.rgba(0, 100 + c % 150, 0, c % 255);
 });
-pattern3.draw();
+pattern3.animate();
 
 const pattern4 = new PatternRenderer('pattern4', (x, y) => {
     let c = 10 * Math.sqrt(x * x + y * y);
     return Colour.rgba(100 + c % 155, 100 + c % 155, 0, 150);
 });
-pattern4.draw();
+pattern4.animate();
 
 const pattern5 = new PatternRenderer('pattern5', (x, y) => {
     let c = x * Math.sin(y) * y * Math.cos(x);
     return Colour.rgba(c % 255, c % 255, c % 255, 150);
 });
-pattern5.draw();
+pattern5.animate();
 
 const pattern6 = new PatternRenderer('pattern6', (x, y) => {
     let c = Math.sqrt(x * Math.sin(y) * y * Math.cos(x));
     return Colour.rgba(c % 255, c % 255, c % 255, 150);
 });
-pattern6.draw();
+pattern6.animate();
 
 const pattern7 = new PatternRenderer('pattern7', (x, y) => {
     let r = Math.random() * x + y;
@@ -90,7 +140,7 @@ const pattern7 = new PatternRenderer('pattern7', (x, y) => {
     let b = Math.random() * x * y;
     return Colour.rgba(r % 250, g % 250, b % 250, 150);
 });
-pattern7.draw();
+pattern7.animate();
 
 
 
