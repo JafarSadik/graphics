@@ -36,8 +36,8 @@ class AnimationParameter {
         return this.current;
     }
 
-    static bounded(start, max, delta) {
-        return new AnimationParameter(start, start, max, delta);
+    static bounded(start, min, max, delta) {
+        return new AnimationParameter(start, min, max, delta);
     }
 
     static unbounded(start, delta) {
@@ -101,38 +101,38 @@ class PatternRenderer {
 const pattern1 = new PatternRenderer('pattern1', (x, y, param) => {
     let c = 50 + Math.sin(x * y * param) * y + param;
     return Colour.rgba(c, c, c, c);
-}, AnimationParameter.unbounded(0, 0.01));
-pattern1.animate();
+}, AnimationParameter.unbounded(1, 0.01));
+pattern1.draw();
 
 const pattern2 = new PatternRenderer('pattern2', (x, y, param) => {
     let c = x * y * Math.tan(100 * x * y * param);
     return Colour.rgba(0, 0, 100 + c % 150, 100 + c % 150);
-}, AnimationParameter.bounded(0.001, 1, 0.0001));
-pattern2.animate();
+}, AnimationParameter.bounded(0.001, 0, 1, 0.0001));
+pattern2.draw();
 
 const pattern3 = new PatternRenderer('pattern3', (x, y) => {
     let c = x * y * Math.cos(x + y);
     return Colour.rgba(0, 100 + c % 150, 0, c % 255);
 });
-pattern3.animate();
+pattern3.draw();
 
 const pattern4 = new PatternRenderer('pattern4', (x, y) => {
     let c = 10 * Math.sqrt(x * x + y * y);
     return Colour.rgba(100 + c % 155, 100 + c % 155, 0, 150);
 });
-pattern4.animate();
+pattern4.draw();
 
 const pattern5 = new PatternRenderer('pattern5', (x, y) => {
     let c = x * Math.sin(y) * y * Math.cos(x);
     return Colour.rgba(c % 255, c % 255, c % 255, 150);
 });
-pattern5.animate();
+pattern5.draw();
 
 const pattern6 = new PatternRenderer('pattern6', (x, y) => {
     let c = Math.sqrt(x * Math.sin(y) * y * Math.cos(x));
     return Colour.rgba(c % 255, c % 255, c % 255, 150);
 });
-pattern6.animate();
+pattern6.draw();
 
 const pattern7 = new PatternRenderer('pattern7', (x, y) => {
     let r = Math.random() * x + y;
@@ -140,7 +140,14 @@ const pattern7 = new PatternRenderer('pattern7', (x, y) => {
     let b = Math.random() * x * y;
     return Colour.rgba(r % 250, g % 250, b % 250, 150);
 });
-pattern7.animate();
+pattern7.draw();
+
+const pattern8 = new PatternRenderer('pattern8', (x, y, param) => {
+    let c = (Math.sin(x * y * param) * 255);
+    return Colour.rgba(c % 255, c % 255, c % 255, 150);
+}, AnimationParameter.bounded(1.0, 0.0001, 4, 0.001));
+pattern8.draw();
+
 
 
 
