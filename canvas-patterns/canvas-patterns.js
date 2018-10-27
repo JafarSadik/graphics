@@ -143,11 +143,16 @@ const pattern7 = new PatternRenderer('pattern7', (x, y) => {
 pattern7.draw();
 
 const pattern8 = new PatternRenderer('pattern8', (x, y, param) => {
-    let c = (Math.sin(x * y * param) * 255);
+    let c = Math.sin(x * y * param) * 255;
     return Colour.rgba(c % 255, c % 255, c % 255, 150);
 }, AnimationParameter.bounded(1.0, 0.0001, 4, 0.001));
 pattern8.draw();
 
+const pattern9 = new PatternRenderer('pattern9', (x, y) => {
+    let c = 10 * Math.sqrt(Math.pow(x, 3) + Math.pow(y, 3));
+    return Colour.rgba(0, 100 + c % 155, 0, 150);
+});
+pattern9.draw();
 
 
 
