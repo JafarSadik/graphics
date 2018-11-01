@@ -2,9 +2,20 @@
 <head>
     <title>Electric field simulation</title>
     <meta charset="UTF-8">
+    <style>
+        * { margin: 0; padding: 0;}
+
+        body, html { height:100%; }
+
+        canvas {
+            position:absolute;
+            width:100%;
+            height:100%;
+        }
+    </style>
 </head>
 <body>
-    <canvas id="display" width="800" height="600"></canvas>
+    <canvas id="display"></canvas>
     <script src="electric-field.js"></script>
 </body>
 </html>
