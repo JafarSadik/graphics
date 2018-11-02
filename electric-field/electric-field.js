@@ -7,6 +7,28 @@ canvas.width = width;
 canvas.height = height;
 let image = ctx.createImageData(width, height);
 
+class FPS {
+    constructor() {
+        this.frameCounter = 0;
+        this.fps = 0;
+        this.second = 0;
+    }
+
+    inc() {
+        let second = Math.floor(Date.now() / 1000);
+        if (second > this.second) {
+            this.fps = this.frameCounter;
+            this.second = second;
+            this.frameCounter = 0;
+        }
+        this.frameCounter++;
+    }
+
+    get() {
+        return this.fps;
+    }
+}
+
 class Colour {
     constructor(r, g, b, a) {
         this.r = r;
@@ -204,6 +226,7 @@ const K = 8.996e9, timeStep = 20e-9;
 class ParticleSystem {
     constructor(particles) {
         this.particles = particles;
+        this.fps = new FPS();
     }
 
     static build(...particles) {
@@ -212,11 +235,13 @@ class ParticleSystem {
 
     start() {
         const animate = () => {
-            this._update();
+            this.$update();
             this.render();
+            this.fps.inc();
             requestAnimationFrame(animate);
         };
-        requestAnimationFrame(animate)
+        requestAnimationFrame(animate);
+        this.$logFPS()
     }
 
     render() {
@@ -226,7 +251,7 @@ class ParticleSystem {
             for (let y = 0; y < height; y++) {
                 let screenPos = vec2d(x, y);
                 let simulationPos = screenPos.mult(scale);
-                let voltage = this._voltageAt(simulationPos);
+                let voltage = this.$voltageAt(simulationPos);
                 let colour = voltage > 0 ? rgb(voltage * 8, 0, 0) : rgb(0, 0, -8 * voltage);
 
                 setPixel(x, y, colour);
@@ -235,21 +260,27 @@ class ParticleSystem {
         ctx.putImageData(image, 0, 0)
     }
 
-    _update() {
+    $logFPS() {
+        setInterval(() => {
+            console.log(`fps: ${this.fps.get()}`)
+        }, 1000);
+    }
+
+    $update() {
         // update forces
         for (let particle of this.particles) {
-            particle.force = this._calculateForce(particle);
+            particle.force = this.$calculateForce(particle);
         }
 
         // update position and velocity
         this.particles.forEach(particle => particle.update());
     }
 
-    _voltageAt(point) {
+    $voltageAt(point) {
         return this.particles.reduce((sum, particle) => sum + K * particle.charge / (particle.distance(point)), 0);
     }
 
-    _calculateForce(particle) {
+    $calculateForce(particle) {
         let particle1 = particle;
         let force = vec2d(0, 0);
 
