@@ -257,8 +257,15 @@ const pattern14 = new PatternRenderer('pattern14', function(x, y) {
 });
 pattern14.draw();
 
-const pattern15 = new PatternRenderer('pattern15', function(x, y) {
-    return hsl(x / this.width, y / this.height, 0.5);
+const pattern15 = new PatternRenderer('pattern15', function(hue, saturation) {
+    const luminosity = 0.5;
+    return hsl(hue / this.width, saturation / this.height, luminosity);
 });
 pattern15.draw();
+
+const pattern16 = new PatternRenderer('pattern16', function(hue) {
+    const luminosity = 0.5, saturation = 0.5;
+    return hsl(hue / this.width, saturation, luminosity);
+});
+pattern16.draw();
 
