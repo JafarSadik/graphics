@@ -7,10 +7,6 @@ canvas.width = width;
 canvas.height = height;
 let image = ctx.createImageData(width, height);
 
-function getTime() {
-    return new Date().getTime();
-}
-
 class Colour {
     constructor(r, g, b, a) {
         this.r = r;
@@ -25,6 +21,33 @@ class Colour {
 
     static rgb(r, g, b) {
         return Colour.rgba(r, g, b, 255);
+    }
+
+    // Converts HSL color value to RGB. Assumes h, s, and l are contained in the set [0, 1].
+    static hsl(h, s, l) {
+        let r, g, b;
+
+        function hue2rgb(p, q, t) {
+            if (t < 0) t += 1;
+            if (t > 1) t -= 1;
+            if (t < 1 / 6) return p + (q - p) * 6 * t;
+            if (t < 1 / 2) return q;
+            if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+            return p;
+        }
+
+        if (s === 0) {
+            r = g = b = l;
+        } else {
+            let q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+            let p = 2 * l - q;
+
+            r = hue2rgb(p, q, h + 1 / 3);
+            g = hue2rgb(p, q, h);
+            b = hue2rgb(p, q, h - 1 / 3);
+        }
+
+        return Colour.rgb(Math.round(r * 255), Math.round(g * 255), Math.round(b * 255));
     }
 
     get rgb() {
@@ -64,33 +87,6 @@ class Colour {
         }
 
         return [h, s, l];
-    }
-
-    // Converts HSL color value to RGB. Assumes h, s, and l are contained in the set [0, 1].
-    static hsl(h, s, l) {
-        let r, g, b;
-
-        function hue2rgb(p, q, t) {
-            if (t < 0) t += 1;
-            if (t > 1) t -= 1;
-            if (t < 1 / 6) return p + (q - p) * 6 * t;
-            if (t < 1 / 2) return q;
-            if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
-            return p;
-        }
-
-        if (s === 0) {
-            r = g = b = l;
-        } else {
-            let q = l < 0.5 ? l * (1 + s) : l + s - l * s;
-            let p = 2 * l - q;
-
-            r = hue2rgb(p, q, h + 1 / 3);
-            g = hue2rgb(p, q, h);
-            b = hue2rgb(p, q, h - 1 / 3);
-        }
-
-        return Colour.rgb(Math.round(r * 255), Math.round(g * 255), Math.round(b * 255));
     }
 }
 
@@ -148,7 +144,7 @@ class Vector2D {
     }
 
     length() {
-        return this.distance(Vector2D.zero());
+        return this.distance(Vector2D.vec2d(0, 0));
     }
 
     normal() {
@@ -160,16 +156,14 @@ class Vector2D {
         return this.x === particle.x && this.y === particle.y;
     }
 
-    static zero() {
-        return Vector2D.vec2d(0, 0);
-    }
-
     static vec2d(x, y) {
         return new Vector2D(x, y);
     }
-}
 
-let {vec2d} = Vector2D;
+    toString() {
+        return `vec2d(${this.x}, ${this.y})`;
+    }
+}
 
 class Particle {
     constructor(position, velocity, charge, mass) {
@@ -177,105 +171,107 @@ class Particle {
         this.velocity = velocity;
         this.charge = charge;
         this.mass = mass;
-        this.force = Vector2D.zero();
+        this.force = vec2d(0, 0);
+    }
+
+    static create(position, velocity, charge, mass) {
+        return new Particle(position, velocity, charge, mass);
+    }
+
+    update() {
+        this.position = this.position.add(this.velocity.scale(timeStep));
+        this.velocity = this.velocity.add(this.force.scale(timeStep / this.mass));
     }
 
     equals(particle) {
         return this.position.equals(particle.position);
     }
 
-    static create(position, velocity, charge, mass) {
-        return new Particle(position, velocity, charge, mass);
+    distance(particle) {
+        return this.position.distance(particle);
+    }
+
+    toString() {
+        return `Particle(position: ${this.position}, velocity: ${this.velocity}, charge: ${this.charge}, mass: ${this.mass}, force: ${this.force})`;
     }
 }
 
-const K = 8.996e9, EPS = 10e-80;
-let timeStep = 6e-14;
-let lastParticle = getTime();
-let sign = 1;
+const {vec2d} = Vector2D;
+const {rgb} = Colour;
+const particle = Particle.create;
+const K = 8.996e9, timeStep = 20e-9;
 
-let particles = [
-    Particle.create(vec2d(47e-10,50e-10,0), Vector2D.zero(), 20e-19, 10e-29),
-    Particle.create(vec2d(50e-10,50e-10,0), Vector2D.zero(), -28e-19, 10e-29),
-    Particle.create(vec2d(53e-10,53e-10,0), Vector2D.zero(), 21e-19, 10e-29)
-];
-
-function voltageAt(point) {
-
-    let voltage = 0;
-
-    for (let particle of particles) {
-        voltage += K * particle.charge / (EPS + particle.position.distance(point))
+class ParticleSystem {
+    constructor(particles) {
+        this.particles = particles;
     }
 
-    return voltage;
-}
-
-function update() {
-    // update forces
-    for (let particle of particles) {
-        particle.force = calculateForce(particle);
+    static build(...particles) {
+        return new ParticleSystem(particles);
     }
 
-    // update position and velocity
-    for (let particle of particles) {
-        particle.position = particle.position.add(particle.velocity.scale(timeStep));
-        particle.velocity = particle.velocity.add(particle.force.scale(timeStep / particle.mass));
+    start() {
+        const animate = () => {
+            this._update();
+            this.render();
+            requestAnimationFrame(animate);
+        };
+        requestAnimationFrame(animate)
     }
-}
 
-function calculateForce(particle) {
-    let particle1 = particle;
-    let force = vec2d(0, 0);
+    render() {
+        const scale = vec2d(10e-9 / width, 10e-9 / height);
 
-    for (let particle2 of particles) {
-        let vec = particle1.position.sub(particle2.position);
-        let length = vec.length();
+        for (let x = 0; x < width; x++) {
+            for (let y = 0; y < height; y++) {
+                let screenPos = vec2d(x, y);
+                let simulationPos = screenPos.mult(scale);
+                let voltage = this._voltageAt(simulationPos);
+                let colour = voltage > 0 ? rgb(voltage * 8, 0, 0) : rgb(0, 0, -8 * voltage);
 
-        if (length > EPS) {
-            force = force.add(vec.normal().scale(K * (particle1.charge * particle2.charge) / length));
+                setPixel(x, y, colour);
+            }
         }
+        ctx.putImageData(image, 0, 0)
     }
 
-    return force;
-}
-/*
-function updateForces() {
-    /!*const positive = 1, negative = -1;
-
-    if (getTime() - lastParticle > 2000) {
-        let px = Math.random() / 100000000;
-        let py = Math.random() / 100000000;
-        //let type = Math.random() < 0.5 ? negative : positive;
-        let charge = sign * Math.random() * 20 * 10e-20 * (Math.random() < 0.5);
-        sign *= -1;
-        particles.push(Particle.create(vec2d(px, py), vec2d(47e-10, 50e-10), charge, 10e-29));
-
-        lastParticle = getTime();
-    }*!/
-
-}*/
-
-function render() {
-    const scale = vec2d(10e-9 / width, 10e-9 / height);
-
-    for (let x = 0; x < width; x++) {
-        for (let y = 0; y < height; y++) {
-            let screenPos = vec2d(x, y);
-            let simulationPos = screenPos.mult(scale);
-            let voltage = voltageAt(simulationPos);
-            let colour = voltage > 0 ? Colour.rgb(voltage * 2, 0, 0) : Colour.rgb(0, 0, -2 * voltage);
-
-            setPixel(x, y, colour);
+    _update() {
+        // update forces
+        for (let particle of this.particles) {
+            particle.force = this._calculateForce(particle);
         }
+
+        // update position and velocity
+        this.particles.forEach(particle => particle.update());
     }
-    ctx.putImageData(image, 0, 0)
+
+    _voltageAt(point) {
+        return this.particles.reduce((sum, particle) => sum + K * particle.charge / (particle.distance(point)), 0);
+    }
+
+    _calculateForce(particle) {
+        let particle1 = particle;
+        let force = vec2d(0, 0);
+
+        for (let particle2 of this.particles) {
+            if (!particle1.equals(particle2)) {
+                let vec = particle1.position.sub(particle2.position);
+                let length = vec.length();
+
+                if (length !== 0) {
+                    force = force.add(vec.normal().scale(K * particle1.charge * particle2.charge / length * length));
+                }
+            }
+        }
+
+        return force;
+    }
 }
 
-function animate() {
-    requestAnimationFrame(animate);
-    update();
-    render();
-}
+const particleSystem = ParticleSystem.build(
+    particle(vec2d(47e-10, 50e-10), vec2d(0, 0), 20e-19, 10e-29),
+    particle(vec2d(50e-10, 50e-10), vec2d(0, 0), -30e-19, 10e-18),
+    particle(vec2d(53e-10, 53e-10), vec2d(0, 0), 20e-19, 10e-29)
+);
 
-animate();
+particleSystem.start();
