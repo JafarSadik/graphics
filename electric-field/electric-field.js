@@ -174,11 +174,7 @@ class Vector2D {
         return Vector2D.vec2d(this.x / length, this.y / length);
     }
 
-    equals(particle) {
-        return this.x === particle.x && this.y === particle.y;
-    }
-
-    static vec2d(x, y) {
+    static vec2d(x = 0, y = 0) {
         return new Vector2D(x, y);
     }
 
@@ -280,22 +276,15 @@ class ParticleSystem {
         return this.particles.reduce((sum, particle) => sum + K * particle.charge / (particle.distance(point)), 0);
     }
 
-    $calculateForce(particle) {
-        let particle1 = particle;
-        let force = vec2d(0, 0);
-
-        for (let particle2 of this.particles) {
-            if (!particle1.equals(particle2)) {
-                let vec = particle1.position.sub(particle2.position);
-                let length = vec.length();
-
-                if (length !== 0) {
-                    force = force.add(vec.normal().scale(K * particle1.charge * particle2.charge / length * length));
-                }
+    $calculateForce(particle1) {
+        return this.particles.reduce((force, particle2) => {
+            let vector = particle1.position.sub(particle2.position);
+            let distance = vector.length();
+            if (distance !== 0) {
+                force = force.add(vector.normal().scale(K * particle1.charge * particle2.charge / distance * distance));
             }
-        }
-
-        return force;
+            return force;
+        }, vec2d());
     }
 }
 
