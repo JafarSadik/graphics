@@ -162,7 +162,9 @@ class Vector2D {
     }
 
     distance(point) {
-        return Math.sqrt((this.x - point.x) ** 2 + (this.y - point.y) ** 2);
+        let dx = (this.x - point.x);
+        let dy = (this.y - point.y);
+        return Math.sqrt(dx * dx + dy * dy);
     }
 
     length() {
@@ -218,6 +220,14 @@ const {vec2d} = Vector2D;
 const {rgb} = Colour;
 const particle = Particle.create;
 const K = 8.996e9, timeStep = 20e-9;
+
+const requestAnimationFrame =
+    requestAnimationFrame ||
+    window.mozRequestAnimationFrame ||
+    window.webkitRequestAnimationFrame ||
+    window.msRequestAnimationFrame ||
+    window.oRequestAnimationFrame ||
+    ((fun) => setTimeout(fun, 20));
 
 class ParticleSystem {
     constructor(particles) {
@@ -295,3 +305,4 @@ const particleSystem = ParticleSystem.build(
 );
 
 particleSystem.start();
+//particleSystem.render();
