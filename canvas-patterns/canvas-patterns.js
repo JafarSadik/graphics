@@ -171,43 +171,43 @@ class PatternRenderer {
 const {pow, sin, cos, tan, sqrt, log, random} = Math;
 const {rgb, rgba, hsl} = Colour;
 
-const pattern1 = new PatternRenderer('pattern1', function(x, y, param) {
+const pattern1 = new PatternRenderer('pattern1', function (x, y, param) {
     let c = 50 + sin(x * y * param) * y + param;
-    return rgba(c %  255, c %  255, c %  255, c %  255);
+    return rgba(c % 255, c % 255, c % 255, c % 255);
 }, AnimationParameter.unbounded(1, 0.01));
 pattern1.draw();
 
-const pattern2 = new PatternRenderer('pattern2', function(x, y, param) {
+const pattern2 = new PatternRenderer('pattern2', function (x, y, param) {
     let c = x * y * tan(100 * x * y * param);
     return rgba(0, 0, 100 + c % 150, 100 + c % 150);
 }, AnimationParameter.bounded(0.001, 0, 1, 0.0001));
 pattern2.draw();
 
-const pattern3 = new PatternRenderer('pattern3', function(x, y) {
+const pattern3 = new PatternRenderer('pattern3', function (x, y) {
     let c = x * y * cos(x + y);
     return rgba(0, 100 + c % 150, 0, c % 255);
 });
 pattern3.draw();
 
-const pattern4 = new PatternRenderer('pattern4', function(x, y) {
-    let c = 10 * sqrt(x ** 2 + y ** 2);
+const pattern4 = new PatternRenderer('pattern4', function (x, y) {
+    let c = 10 * sqrt(pow(x, 2) + pow(y, 2));
     return rgba(c % 255, c % 255, c % 255, c % 255);
 });
 pattern4.draw();
 
-const pattern5 = new PatternRenderer('pattern5', function(x, y) {
+const pattern5 = new PatternRenderer('pattern5', function (x, y) {
     let c = x * sin(y) * y * cos(x);
     return rgba(c % 255, c % 255, c % 255, 150);
 });
 pattern5.draw();
 
-const pattern6 = new PatternRenderer('pattern6', function(x, y) {
+const pattern6 = new PatternRenderer('pattern6', function (x, y) {
     let c = sqrt(x * sin(y) * y * cos(x));
     return rgba(c % 255, c % 255, c % 255, 150);
 });
 pattern6.draw();
 
-const pattern7 = new PatternRenderer('pattern7', function(x, y) {
+const pattern7 = new PatternRenderer('pattern7', function (x, y) {
     let r = random() * x + y;
     let g = random() * y + x;
     let b = random() * x * y;
@@ -215,55 +215,55 @@ const pattern7 = new PatternRenderer('pattern7', function(x, y) {
 });
 pattern7.draw();
 
-const pattern8 = new PatternRenderer('pattern8', function(x, y, param) {
+const pattern8 = new PatternRenderer('pattern8', function (x, y, param) {
     let c = sin(x * y * param) * 255;
     return rgba(c % 255, c % 255, c % 255, 150);
 }, AnimationParameter.bounded(1.0, 0.0001, 4, 0.001));
 pattern8.draw();
 
 const pattern9 = new PatternRenderer('pattern9', (x, y) => {
-    let c = 10 * sqrt(x ** 3 + y ** 3);
+    let c = 10 * sqrt(pow(x, 3) + pow(y, 3));
     return rgba(0, 100 + c % 155, 0, 150);
 });
 pattern9.draw();
 
-const pattern10 = new PatternRenderer('pattern10', function(x, y) {
-    let c = 10 * x ** 1.33;
+const pattern10 = new PatternRenderer('pattern10', function (x, y) {
+    let c = 10 * pow(x, 1.33);
     return rgba(255, (150 + c) % 240, 15, 150);
 });
 pattern10.draw();
 
-const pattern11 = new PatternRenderer('pattern11', function(x, y) {
-    let c = sqrt(x ** 0.5 * y ** 0.25) * 255;
+const pattern11 = new PatternRenderer('pattern11', function (x, y) {
+    let c = sqrt(pow(x, 0.5) * pow(y, 0.25)) * 255;
     return rgba(c % 255, c % 255, c % 255, c % 255);
 });
 pattern11.draw();
 
-const pattern12 = new PatternRenderer('pattern12', function(x, y) {
-    let c = (x ** 3 * y ** 3) ** 0.33 * 255;
+const pattern12 = new PatternRenderer('pattern12', function (x, y) {
+    let c = pow((pow(x, 3) * pow(y, 3)), 0.33) * 255;
     return rgba(c % 255, 0, 0, c % 255);
 });
 pattern12.draw();
 
-const pattern13 = new PatternRenderer('pattern13', function(x, y) {
+const pattern13 = new PatternRenderer('pattern13', function (x, y) {
     let c = pow(sin(x * y) * cos(x * y), 2) * 255;
     return rgba(0, 0, c % 255, c % 255);
 });
 pattern13.draw();
 
-const pattern14 = new PatternRenderer('pattern14', function(x, y) {
-    let c = pow(cos(x * y) ** 3, log(x * y)) * 255;
+const pattern14 = new PatternRenderer('pattern14', function (x, y) {
+    let c = pow(pow(cos(x * y), 3), log(x * y)) * 255;
     return rgba(0, 0, c % 255, c % 255);
 });
 pattern14.draw();
 
-const pattern15 = new PatternRenderer('pattern15', function(hue, saturation) {
+const pattern15 = new PatternRenderer('pattern15', function (hue, saturation) {
     const luminosity = 0.5;
     return hsl(hue / this.width, saturation / this.height, luminosity);
 });
 pattern15.draw();
 
-const pattern16 = new PatternRenderer('pattern16', function(hue) {
+const pattern16 = new PatternRenderer('pattern16', function (hue) {
     const luminosity = 0.5, saturation = 0.5;
     return hsl(hue / this.width, saturation, luminosity);
 });
