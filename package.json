@@ -5,20 +5,22 @@
   },
   "private": true,
   "scripts": {
-    "clean": "rimraf build",
+    "clean": "rimraf build deploy",
     "build": "run-s clean build:*",
     "prestart": "run-s build",
     "start": "run-p dev:*",
     "dev:watch": "npm-watch",
-    "dev:live-server": "live-server build --port=9000",
+    "dev:live-server": "live-server deploy --port=9000",
     "*** Electric Field ***": "",
-    "build:electric-field": "run-p electric-field:*",
-    "electric-field:js": "babel electric-field/**/*.js -d build",
-    "electric-field:copy-assets": "cpx electric-field/**/*.{html,css} build/electric-field",
+    "build:electric-field": "run-s electric-field:*",
+    "electric-field:build-js": "babel electric-field/**/*.js -d build",
+    "electric-field:package-js": "mkdirp deploy/electric-field && browserify build/electric-field/electric-field.js | uglifyjs > deploy/electric-field/app.js",
+    "electric-field:copy-assets": "cpx electric-field/**/*.{html,css} deploy/electric-field/",
     "*** Canvas Patterns ***": "",
-    "build:canvas-patterns": "run-p canvas-patterns:*",
-    "canvas-patterns:js": "babel canvas-patterns/**/*.js -d build",
-    "canvas-patterns:copy-assets": "cpx canvas-patterns/**/*.{html,css} build/canvas-patterns"
+    "build:canvas-patterns": "run-s canvas-patterns:*",
+    "canvas-patterns:build-js": "babel canvas-patterns/**/*.js -d build",
+    "canvas-patterns:package-js": "mkdirp deploy/canvas-patterns && browserify build/canvas-patterns/canvas-patterns.js | uglifyjs  > deploy/canvas-patterns/app.js",
+    "canvas-patterns:copy-assets": "cpx canvas-patterns/**/*.{html,css} deploy/canvas-patterns/"
   },
   "watch": {
     "build:electric-field": {
@@ -31,15 +33,20 @@
     }
   },
   "devDependencies": {
-    "cpx": "^1.5.0",
-    "npm-run-all": "^4.1.2",
-    "rimraf": "^2.5.4",
-    "live-server": "^1.2.0",
-    "npm-watch": "^0.3.0",
     "babel-cli": "^6.26.0",
     "babel-plugin-transform-runtime": "^6.23.0",
     "babel-preset-env": "^1.6.1",
     "babel-preset-es2015": "^6.24.1",
-    "babel-preset-stage-2": "^6.24.1"
+    "babel-preset-stage-2": "^6.24.1",
+    "browserify": "^16.2.3",
+    "cpx": "^1.5.0",
+    "live-server": "^1.2.0",
+    "npm-run-all": "^4.1.2",
+    "npm-watch": "^0.3.0",
+    "rimraf": "^2.5.4",
+    "uglifyjs": "^2.4.11"
+  },
+  "dependencies": {
+    "canvas-sandbox": "^1.1.5"
   }
 }

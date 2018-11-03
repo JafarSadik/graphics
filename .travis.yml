@@ -8,10 +8,6 @@ install:
 script:
   - npm run build
 
-before_deploy:
-  - mkdir deploy/
-  - cp -r build/* deploy/
-
 deploy:
   provider: surge
   skip_cleanup: true
