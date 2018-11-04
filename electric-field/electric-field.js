@@ -24,7 +24,7 @@ class Particle {
         this.velocity = velocity;
         this.charge = charge;
         this.mass = mass;
-        this.force = vec2d(0, 0);
+        this.force = Vector2D.vec2d(0, 0);
     }
 
     static create(position, velocity, charge, mass) {
