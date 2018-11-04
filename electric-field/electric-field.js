@@ -52,7 +52,7 @@ class Particle {
 const vec2d = Vector2D.vec2d, rgb = Colour.rgb, particle = Particle.create;
 const K = 8.996e9, timeStep = 20e-9;
 
-const requestAnimationFrame = requestAnimationFrame || ((fun) => setTimeout(fun, 20));
+const reqAnimationFrame = requestAnimationFrame || ((fun) => setTimeout(fun, 20));
 
 class ParticleSystem {
     constructor(particles) {
@@ -69,9 +69,9 @@ class ParticleSystem {
             this.$update();
             this.render();
             this.fps.inc();
-            requestAnimationFrame(animate);
+            reqAnimationFrame(animate);
         };
-        requestAnimationFrame(animate);
+        reqAnimationFrame(animate);
         this.$logFPS()
     }
 
