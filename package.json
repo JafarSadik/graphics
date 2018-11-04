@@ -47,6 +47,6 @@
     "uglify-js": "^3.4.9"
   },
   "dependencies": {
-    "canvas-sandbox": "^1.2.6"
+    "canvas-sandbox": "^1.2.8"
   }
 }
