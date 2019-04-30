@@ -15,12 +15,12 @@
     "build:electric-field": "run-s electric-field:*",
     "electric-field:build-js": "babel electric-field/**/*.js -d build",
     "electric-field:package-js": "mkdirp deploy/electric-field && browserify build/electric-field/electric-field.js | uglifyjs  > deploy/electric-field/app.js",
-    "electric-field:copy-assets": "cpx electric-field/**/*.{html,css} deploy/electric-field/",
+    "electric-field:copy-assets": "cpx 'electric-field/**/*.{html,css}' deploy/electric-field/",
     "*** Canvas Patterns ***": "",
     "build:canvas-patterns": "run-s canvas-patterns:*",
     "canvas-patterns:build-js": "babel canvas-patterns/**/*.js -d build",
     "canvas-patterns:package-js": "mkdirp deploy/canvas-patterns && browserify build/canvas-patterns/canvas-patterns.js | uglifyjs   > deploy/canvas-patterns/app.js",
-    "canvas-patterns:copy-assets": "cpx canvas-patterns/**/*.{html,css} deploy/canvas-patterns/"
+    "canvas-patterns:copy-assets": "cpx 'canvas-patterns/**/*.{html,css}' deploy/canvas-patterns/"
   },
   "watch": {
     "build:electric-field": {
